@@ -1,0 +1,57 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Welcome to Chartbase</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+#ex1 {
+    width: 800px;
+}
+        </style>
+    </head>
+    <body>
+        <div>
+            <p>Example 1.</p>
+            <div id="ex1"></div>
+        </div>
+
+        <script src="../src/d3.v3.min.js" charset="utf-8"></script>
+        <script src="../chartbase.js" charset="utf-8"></script>
+        <script src="../plugins.js" charset="utf-8"></script>
+        <script>
+var ex1 = chartbase.make("#ex1", {
+        width: 500,
+        aspect: 0.5
+    })
+    .use("echo", "Hello from Chartbase")
+    .use(function(chart, control) {
+        control.wait = true;
+        setTimeout(function() {
+            console.log("Async function has returned.")
+            control.resume()
+        }, 500);
+    });
+
+    ex1.use("axis", "x")
+    .use(function(chart, control) {
+        control.wait = true;
+        setTimeout(function() {
+            console.log("Async function has returned.")
+            control.resume()
+        }, 500);
+    })
+    .use("axis", {
+        name: "y",
+        direction: "vertical"
+    })
+    .use("expose");
+
+    console.log(ex1.chart);
+
+        </script>
+
+    </body>
+</html>
