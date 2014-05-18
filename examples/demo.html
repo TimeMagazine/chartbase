@@ -22,11 +22,13 @@
         <script src="../chartbase.js" charset="utf-8"></script>
         <script src="../plugins.js" charset="utf-8"></script>
         <script>
-var ex1 = chartbase.make("#ex1", {
+
+var ex1 = chartbase("#ex1", {
         width: 500,
         aspect: 0.5
     })
     .use("echo", "Hello from Chartbase")
+    .use("data", { name: "Chris" })
     .use(function(chart, control) {
         control.wait = true;
         setTimeout(function() {
@@ -36,20 +38,14 @@ var ex1 = chartbase.make("#ex1", {
     });
 
     ex1.use("axis", "x")
-    .use(function(chart, control) {
-        control.wait = true;
-        setTimeout(function() {
-            console.log("Async function has returned.")
-            control.resume()
-        }, 500);
-    })
-    .use("axis", {
-        name: "y",
-        direction: "vertical"
-    })
-    .use("expose");
+        .use("axis", {
+            name: "y",
+            tickSize: 6
 
-    console.log(ex1.chart);
+        })
+        .use("expose");
+
+    console.log(ex1);
 
         </script>
 
