@@ -28,6 +28,9 @@
 
         return base
     };
+    
+    // Global plugin registry; might want to use getters and setters for this
+    chartbase.plugins = {};
 
 
     if (typeof define === "function" && define.amd) { // RequireJS
