@@ -8,7 +8,7 @@
         .use(p.background("blue"))
         .use(p.resize(500, 200, { delay: 400 }))
         .use(p.background("red"))
-        .use(p.goldenresize("landscape", { duration: 500 }))
+        .use(p.golden_resize("landscape", { duration: 500 }))
         .use(p.background("white", {
             "stroke-width": 1,
             stroke: "black"

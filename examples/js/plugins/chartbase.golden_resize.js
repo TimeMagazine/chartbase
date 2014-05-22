@@ -3,7 +3,7 @@
 
     // orientation = "landscape" or "portrait"
     // opts = see chartbase.plugins.resize
-    chartbase.plugins.goldenresize = function (orientation, opts) {
+    chartbase.plugins.golden_resize = function (orientation, opts) {
 
         var multiplier = {
             landscape: 1/GOLDEN,
