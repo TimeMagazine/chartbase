@@ -3,7 +3,7 @@
 
     // orientation = "landscape" or "portrait"
     // opts = see chartbase.plugins.resize
-    chartbase.plugins.golden_resize = function (orientation, opts) {
+    var plugin = function (orientation, opts) {
 
         var multiplier = {
             landscape: 1/GOLDEN,
@@ -21,5 +21,13 @@
             resizer.call(this, next);
         };
     };
+
+    chartbase.plugins.golden_resize = plugin;
+
+    if (typeof define === "function" && define.amd) { // RequireJS
+        define(plugin);
+    } else if (typeof module === "object" && module.exports) { // browserify
+        module.exports = plugin;
+    }
 
 }).call(this, chartbase);
