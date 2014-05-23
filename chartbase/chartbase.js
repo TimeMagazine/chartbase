@@ -3,8 +3,26 @@
     var slice = Array.prototype.slice;
 
     var chartbase = function (el) {
+        var el = d3.select(el);
         var base = {
-            el: d3.select(el),
+            el: el,
+            inner: el.append("g"),
+            background: null,
+            data: null,
+            margin: {
+                top: null,
+                right: null,
+                bottom: null,
+                right: null
+            },
+            scales: {
+                x: null,
+                y: null
+            },
+            axes: {
+                x: null,
+                y: null
+            },
             _queue: []
         };
 
