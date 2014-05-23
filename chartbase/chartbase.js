@@ -50,6 +50,26 @@
     // Global plugin registry; might want to use getters and setters for this
     chartbase.plugins = {};
 
+    // opts can be an array of associative arrays, to control call order,
+    // or just an associative array
+    chartbase.apply_options = function (opts) {
+        var opts = opts instanceof Array ? opts : [ opts ];
+        return function (selection) {
+            opts.forEach(function (optgroup) {
+                d3.map(optgroup).forEach(function (key, value) {
+                    var value = value instanceof Array ? value : [ value ];
+                    selection[key].apply(selection, value)
+                });
+            });
+        };
+    };
+
+    chartbase.apply_attrs = function (attrs) {
+        var attr_map = d3.entries(attrs).map(function (ent) {
+            return { "attr": [ ent.key, ent.value ] }
+        })
+        return chartbase.apply_options(attr_map);
+    };
 
     if (typeof define === "function" && define.amd) { // RequireJS
         define(chartbase);
