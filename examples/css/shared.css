@@ -1,0 +1,18 @@
+.chart {
+    font: 10px sans-serif;
+    display: block;
+    margin: 1em;
+}
+
+.chartbase-axis path, .chartbase-axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.chartbase-line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 2px;
+}
+
