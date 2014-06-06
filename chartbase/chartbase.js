@@ -6,50 +6,85 @@
         var el = d3.select(el);
         var base = {
             el: el,
-            inner: el.append("g"),
-            background: null,
             data: null,
-            margin: {
-                top: null,
-                right: null,
-                bottom: null,
-                right: null
+            elements: {
+                inner: el.append("g"),
+                background: null,
+                axes: {
+                    x: null,
+                    y: null
+                },
+                labels: {
+                    x: null,
+                    y: null,
+                    title: null
+                }
             },
-            scales: {
-                x: null,
-                y: null
+            properties: {
+                margin: null,
+                scales: {
+                    x: null,
+                    y: null
+                }
             },
-            axes: {
-                x: null,
-                y: null
-            },
-            _queue: []
+            control: {
+                queue: []
+            }
+        };
+
+        base.control.invoke = function () {
+            if (base.control._waiting) { return false; }
+            var invokable = base.control.queue.shift();
+            if (invokable) {
+                invokable();
+                base.control.invoke();
+            }
+        };
+
+        base.control.wait = function () {
+            base.control._waiting = true;    
+        };
+
+        base.control.resume = function () {
+            base.control._waiting = false;
+            base.control.invoke();
         };
 
         // Bare-bones plugin registration
-        base.use = function (plugin) {
-            base._queue.push(plugin);
+        base.use = function (plugin_ref) {
+            var ref_is_string = typeof plugin_ref === "string";
+            var plugin = ref_is_string ?
+                chartbase.plugins[plugin_ref] : plugin_ref;
+            if (ref_is_string && typeof plugin === "undefined") {
+                console.log("Couldn't find a plugin named '" + plugin_ref + "'. Moving on.");
+            } else {
+                var opt_args = slice.call(arguments, 1);
+                var args = [ base ].concat(opt_args);
+                var invoker = function () {
+                    plugin.apply(plugin, args);
+                };
+                base.control.queue.push(invoker);
+                base.control.invoke();
+            }
             return base;
         };
 
-        // Bare-bones plugin execution
-        base.build = function (callback) {
-            var cb = callback || function () {};
-            var next = function () {
-                if (!base._queue.length) { return cb(base); }
-                var plugin = base._queue.shift();
-                plugin.call(base, next);
-            };
-            next();
-            return base;
-        };
-
-        return base
+        return base;
     };
-    
+
     // Global plugin registry; might want to use getters and setters for this
     chartbase.plugins = {};
 
+    chartbase.register = function (name, plugin) {
+        if (chartbase.plugins[name]) {
+            console.log("Sorry, there is already a plugin registered to '" + name + "'.");
+            return false;
+        } else {
+            chartbase.plugins[name] = plugin;    
+            return true;
+        }
+    };
+    
     // opts can be an array of associative arrays, to control call order,
     // or just an associative array
     chartbase.apply_options = function (opts) {

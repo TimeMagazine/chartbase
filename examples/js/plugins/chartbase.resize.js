@@ -3,7 +3,7 @@
     // h = height
     // opts.duration = milliseconds of duration, defaults to 0
     // opts.delay = milliseconds of delay, defaults to 0
-    var plugin = function (w, h, opts) {
+    var plugin = function (base, opts) {
         // Default to non-tweened transition
         var opts = opts || {};
         var duration = opts.duration || 0;
@@ -11,28 +11,22 @@
 
         var resize = function (selection) {
             selection
-                .attr("width", w)
-                .attr("height", h);
+                .attr("width", opts.w)
+                .attr("height", opts.h);
         };
 
-        return function (next) {
-            var m = this.margin;
-            this.width = w - (m.left + m.right);
-            this.height = h - (m.top + m.bottom);
-            this.el.transition()
-                .duration(duration)
-                .delay(delay)
-                .call(resize)
-                .each("end", next);
-        };
+        var m = base.properties.margin;
+        base.properties.width = opts.w - (m.left + m.right);
+        base.properties.height = opts.h - (m.top + m.bottom);
+
+        base.control.wait();
+        base.el.transition()
+            .duration(duration)
+            .delay(delay)
+            .call(resize)
+            .each("end", base.control.resume);
     };
 
-    chartbase.plugins.resize = plugin;
-
-    if (typeof define === "function" && define.amd) { // RequireJS
-        define(plugin);
-    } else if (typeof module === "object" && module.exports) { // browserify
-        module.exports = plugin;
-    }
+    chartbase.register("core/resize", plugin);
 
 }).call(this, chartbase);

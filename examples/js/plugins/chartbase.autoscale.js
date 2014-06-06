@@ -1,25 +1,15 @@
 (function (chartbase) {
-    var plugin = function (x_type, y_type) {
-        return function (next) {
-            this.scales.x = (x_type || d3.scale.linear)()
-                .domain([ 0, d3.max(this.data, function (d) { return d.x; }) ])
-                .range([ 0, this.width ]);
+    var plugin = function (base, x_type, y_type) {
+        base.properties.scales.x = (x_type || d3.scale.linear)()
+            .domain([ 0, d3.max(base.data, function (d) { return d.x; }) ])
+            .range([ 0, base.properties.width ]);
 
-            this.scales.y = (y_type || d3.scale.linear)()
-                .domain([ 0, d3.max(this.data, function (d) { return d.y; }) ])
-                .range([ this.height, 0 ]);
-
-            next();
-        };
+        base.properties.scales.y = (y_type || d3.scale.linear)()
+            .domain([ 0, d3.max(base.data, function (d) { return d.y; }) ])
+            .range([ base.properties.height, 0 ]);
     };
 
-    chartbase.plugins.autoscale = plugin;
-
-    if (typeof define === "function" && define.amd) { // RequireJS
-        define(plugin);
-    } else if (typeof module === "object" && module.exports) { // browserify
-        module.exports = plugin;
-    }
+    chartbase.register("jsvine/autoscale", plugin);
 
 }).call(this, chartbase);
 

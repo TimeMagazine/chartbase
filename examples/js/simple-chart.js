@@ -11,26 +11,26 @@
     };
 
     var chart = chartbase(".chart")
-        .use(p.margin(30))
-        .use(p.resize(600, 400))
-        .use(p.background("#EEE", {
+        .use("core/margin", 30)
+        .use("core/resize", { w: 600, h: 400 })
+        .use("core/background", {
+            "fill": "#EEE",
             "stroke-width": 1,
-            stroke: "black"
-        }))
-        .use(function (next) {
-            var base = this;
+            "stroke": "black"
+        })
+        .use(function (base) {
+            base.control.wait();
             d3.csv("data/example-1.csv")
                 .row(parseData)
                 .get(function (error, data) {
                      base.data = data;
-                     next();
+                     base.control.resume();
                 });
         })
-        .use(p.autoscale())
-        .use(p.basic_axes())
-        .use(p.basic_line({
+        .use("jsvine/autoscale")
+        .use("jsvine/basic-axes")
+        .use("jsvine/basic-line", {
             interpolate: "monotone"    
-        }))
-        .build();
+        });
 
 }).call(this);

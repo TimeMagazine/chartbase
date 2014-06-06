@@ -1,28 +1,19 @@
 (function (chartbase) {
 
-    var plugin = function (top, left, bottom, right) {
+    var plugin = function (base, top, left, bottom, right) {
         left = left !== undefined ? left : top;
         bottom = bottom !== undefined ? bottom : top;
         right = right !== undefined ? right : left;
-        return function (next) {
-            this.margin = {
-                top: top,
-                left: left,
-                bottom: bottom,
-                right: right
-            };
-            this.inner.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-            next();
+        var margin = base.properties.margin = {
+            top: top,
+            left: left,
+            bottom: bottom,
+            right: right
         };
+        base.elements.inner.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     };
 
-    chartbase.plugins.margin = plugin;
-
-    if (typeof define === "function" && define.amd) { // RequireJS
-        define(plugin);
-    } else if (typeof module === "object" && module.exports) { // browserify
-        module.exports = plugin;
-    }
+    chartbase.register("core/margin", plugin);
 
 }).call(this, chartbase);
 
