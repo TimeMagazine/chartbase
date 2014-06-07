@@ -1,0 +1,28 @@
+{
+  "name": "chartbase",
+  "version": "0.0.0",
+  "description": "Infinitely customizable charts",
+  "main": "chartbase.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chartbase/chartbase.git"
+  },
+  "keywords": [
+    "chart",
+    "graph",
+    "data",
+    "d3"
+  ],
+  "author": "Jeremy Singer-Vine and Chris Wilson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chartbase/chartbase/issues"
+  },
+  "homepage": "https://github.com/chartbase/chartbase"
+}

@@ -1,83 +1,126 @@
-!function() {	
-	var chartbase = function() {
-		// holds all available plugins for every instance of a chartbase on the page
-		// storing in closure to avoid accidental overwriting as plugin list expands
-		var plugin_roster = {};
+;(function() {	
+    var root = this;
 
-		var factory = function(element, settings) {
-			settings = settings || {}; // settings takes options so instrinic to charts that they are first-order properties
+	// holds all available plugins for every instance of a chartbase on the page
+	var plugins = {};
 
-			// core object 
-			var chart = {
-				el: element,
-				width: settings.width || parseInt(d3.select(element).style("width"), 10)
-			}
+	var chartbase = function(el) {
+		var el = d3.select(el);
 
-			chart.height = settings.height ? settings.height : chart.width * (settings.aspect ? settings.aspect : 0.618);
-
-			// by convention, all d3 objections go here
-			chart.elements = {
-				svg: d3.select(element).append("svg")
-					.attr("width", chart.width)
-					.attr("height", chart.height)
-			};
-
-			// "that"-like object that gets returned
-			var control = {
-				queue: [],
-				wait: false,
-				resume: function() {
-					this.wait = false;
-					invoke();
-				}
-			};
-
-			// start/restart the chain of plugins. 
-			function invoke() {
-				if (!control.wait && control.queue.length) {
-					control.queue.shift()(chart, control);
-					invoke();
-				}
-			}
-
-			control.use = function(plugin, opts) {
-				if (typeof plugin === "string") {
-					if (plugin_roster[plugin]) {
-						// since plugins return a function, they are executed immediately. 
-						plugin = plugin_roster[plugin](opts);
-					} else {
-						console.log("Couldn't find a plugin named \"" + plugin + "\". Moving on.");
-						return control;
-					}
-				}
-
-				// allows for user to pass an anonymous function that accesses `chart` generically
-				if (typeof plugin === "function") {
-					control.queue.push(plugin);
-					invoke();
-				}
-				return control; // enables chaining
-			}
-			return control;
+		if (!el.node()) {
+			return console.log("Chartbase couldn't find the element you gave it.");
 		}
 
-		// add new plugins
-		factory.register = function(pluginName, plugin, overwrite) {
-			if (overwrite || !plugin_roster[pluginName]) {
-				plugin_roster[pluginName] = plugin;
-			} else {
-				console.log("Sorry, there is already a plugin named \"" + pluginName + "\". If you meant to overwrite it, pass `true` after your function.");
-			}
-		};
+		if (!~["svg", "g"].indexOf(el.node().tagName.toLowerCase())) {
+			el = el.append("svg");
+		}
 
-		return factory;
-	}();
+        var width = parseInt(el.style("width"), 10) || 500; // gets computed style as string. But "g" elements return "auto"
+
+		var chart = {
+            el: el,
+            data: null,
+            elements: {
+                inner: el.append("g")
+            },
+            properties: {
+                margin: { top: 20, right: 20, bottom: 50, left: 50 },
+                width: (parseInt(el.style("width"), 10) || 500),                
+                height: width * 0.618
+            },
+            control: {
+				queue: [],		// plugins to run
+				history: [],	// plugins already ran
+				_waiting: false
+            }
+        }
+
+        el.style("height", chart.properties.height);
+
+        // will use these for widths of scales and axes
+        chart.properties.inner_width = chart.properties.width - (chart.properties.margin.left + chart.properties.margin.right);
+        chart.properties.inner_height = chart.properties.height - (chart.properties.margin.top + chart.properties.margin.bottom);
+
+        chart.use = function(plugin_ref) {
+            var plugin = typeof plugin_ref === "string" ? plugins[plugin_ref] : plugin_ref;
+
+       		if (typeof plugin === "function") {
+                var opt_args = Array.prototype.slice.call(arguments, 1),
+                	args = [ chart ].concat(opt_args);
+
+                var invoker = function () {
+                    plugin.apply(plugin, args);
+                };
+                chart.control.queue.push(invoker);
+            } else {
+            	console.log("This plugin was not found or not a function:", plugin_ref);
+            	// can optionally fail here
+            }
+
+			chart.control.invoke();
+            return chart;
+        }
+
+		// start/restart the chain of plugins. 
+        chart.control.invoke = function () {
+            if (chart.control._waiting) { return false; }
+            var invokable = chart.control.queue.shift();
+            if (invokable) {
+                invokable();
+                chart.control.history.push(invokable);
+                chart.control.invoke();
+            }
+        };
+
+		chart.control.wait = function () {
+            chart.control._waiting = true;    
+        };
+
+        chart.control.resume = function () {
+            chart.control._waiting = false;
+            chart.control.invoke();
+        };
+
+        return chart;
+    }
+
+	// add new plugins
+	chartbase.register = function(name, plugin, overwrite) {
+		if (overwrite || !plugins[name]) {
+			plugins[name] = plugin;
+			return true;
+		} else {
+			console.log("Sorry, there is already a plugin named \"" + name + "\". If you meant to overwrite it, pass `true` after your function.");
+			return false;
+		}
+	};
+
+    // opts can be an array of associative arrays, to control call order,
+    // or just an associative array
+    chartbase.apply_options = function (opts) {
+        var opts = opts instanceof Array ? opts : [ opts ];
+        return function (selection) {
+            opts.forEach(function (optgroup) {
+                d3.map(optgroup).forEach(function (key, value) {
+                    var value = value instanceof Array ? value : [ value ];
+                    selection[key].apply(selection, value)
+                });
+            });
+        };
+    };
+
+    chartbase.apply_attrs = function (attrs) {
+        var attr_map = d3.entries(attrs).map(function (ent) {
+            return { "attr": [ ent.key, ent.value ] }
+        })
+        return chartbase.apply_options(attr_map);
+    };
 
 	if (typeof define === "function" && define.amd) { // RequireJS
 	    define(chartbase);
 	} else if (typeof module === "object" && module.exports) { // browserify
 	    module.exports = chartbase;
 	} else {
-	    this.chartbase = chartbase; // directly included
+	    root.chartbase = chartbase; // directly included
 	}
-}();
+}).call(this);
