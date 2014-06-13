@@ -28,9 +28,9 @@
             .domain(d3.extent(chart.data, function (d) { return d[opts.property]; }));
 
         if (opts.direction === "v") {
-            scale.range([chart.properties.inner_height, 0]);
+            scale.range([chart.properties.height, 0]);
         } else {
-            scale.range([0, chart.properties.inner_width]);
+            scale.range([0, chart.properties.width]);
         }
 
         // can't hurt to remember which property is attached to this scale

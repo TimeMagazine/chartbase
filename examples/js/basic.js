@@ -7,8 +7,13 @@ ex1
 	})
 	.use("core/data", "data/example-1.csv")
 	.use("core/scales", "x", "y")
-	.use("core/axes", "x", "y")
-	.use("core/line", {
+	.use("core/axes", "x", {
+		name: "y",
+		options: {
+			tickSize: [-ex1.properties.width, 0]
+		}
+	})
+	.use("graph/line", {
         interpolate: "basis"    		
 	});
 

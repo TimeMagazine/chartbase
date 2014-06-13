@@ -14,20 +14,26 @@
 
         var inner = chart.elements.inner;
         var axes = chart.elements.axes;
-        var scale = opts.scale || chart.properties.scales[name];
+        var scale = opts.scale || chart.properties.scales[name];       
 
         if (typeof scale === "string") {
             scale = chart.scales[scale];
         }
 
-        axes[name] = d3.svg.axis()
+        var axis = axes[name] = d3.svg.axis()
             .scale(scale)
+            .tickSize(4, 0)
             .orient(opts.orientation || (opts.direction === "v" ? "left" : "bottom"));
 
-        inner.append("g")
+        if (opts.options) {
+            chartbase.apply_options(opts.options)(axis);
+        }
+
+        var axisElements = inner.append("g")
             .attr("class", "chartbase-" + name + " chartbase-axis")
-            .attr("transform", opts.direction === "v" ? "translate(0,0)" : "translate(0," + chart.properties.inner_height + ")")
+            .attr("transform", opts.direction === "v" ? "translate(0,0)" : "translate(0," + chart.properties.height + ")")
             .call(axes[name]);
+
     };
 
     chartbase.register("core/axis", axis);

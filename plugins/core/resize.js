@@ -7,19 +7,19 @@
         // Default to non-tweened transition
         var opts = opts || {};
 
-        var aspect = typeof opts.aspect === "number" ? opts.aspect : chart.properties.height / chart.properties.width; // current aspect ratio
+        var aspect = typeof opts.aspect === "number" ? opts.aspect : chart.properties.el_height / chart.properties.el_width; // current aspect ratio
 
         var width = opts.w || parseInt(el.style("width"), 10) || 500; 
-        var height = opts.h || width * aspect;   // can specify new width only and keep aspect ratio
+        var height = opts.h || width * aspect;   // can choose to specify new width only and keep aspect ratio
         var duration = opts.duration || 0;
         var delay = opts.delay || 0;
 
         var m = chart.properties.margin;
 
-        chart.properties.width = width;
-        chart.properties.height = height;
-        chart.properties.inner_width = width - (m.left + m.right);
-        chart.properties.inner_height = height - (m.top + m.bottom);
+        chart.properties.el_width = width;
+        chart.properties.el_height = height;
+        chart.properties.width = width - (m.left + m.right);
+        chart.properties.height = height - (m.top + m.bottom);
 
         chart.control.wait();
 

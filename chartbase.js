@@ -15,7 +15,7 @@
 			el = el.append("svg");
 		}
 
-        var width = parseInt(el.style("width"), 10) || 500; // gets computed style as string. But "g" elements return "auto"
+        var el_width = parseInt(el.style("width"), 10) || 500; // gets computed style as string. But "g" elements return "auto"
 
 		var chart = {
             el: el,
@@ -25,21 +25,21 @@
             },
             properties: {
                 margin: { top: 20, right: 20, bottom: 50, left: 50 },
-                width: (parseInt(el.style("width"), 10) || 500),                
-                height: width * 0.618
+                el_width: el_width,
+                el_height: el_width * 0.618
             },
             control: {
 				queue: [],		// plugins to run
 				history: [],	// plugins already ran
 				_waiting: false
             }
-        }
+        };
 
         el.style("height", chart.properties.height);
 
         // will use these for widths of scales and axes
-        chart.properties.inner_width = chart.properties.width - (chart.properties.margin.left + chart.properties.margin.right);
-        chart.properties.inner_height = chart.properties.height - (chart.properties.margin.top + chart.properties.margin.bottom);
+        chart.properties.width = chart.properties.el_width - (chart.properties.margin.left + chart.properties.margin.right);
+        chart.properties.height = chart.properties.el_height - (chart.properties.margin.top + chart.properties.margin.bottom);
 
         chart.use = function(plugin_ref) {
             var plugin = typeof plugin_ref === "string" ? plugins[plugin_ref] : plugin_ref;

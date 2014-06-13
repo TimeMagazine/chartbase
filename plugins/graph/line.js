@@ -15,7 +15,6 @@
             .attr("class", "chartbase-line")
             .attr("d", line);
 
-        console.log(linepath);
     };
 
     chartbase.register("graph/line", plugin);
