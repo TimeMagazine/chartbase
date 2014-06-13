@@ -1,0 +1,2 @@
+require("./line");
+require("./bar");

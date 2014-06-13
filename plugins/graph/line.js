@@ -18,7 +18,7 @@
         console.log(linepath);
     };
 
-    chartbase.register("core/line", plugin);
+    chartbase.register("graph/line", plugin);
 
 }).call(this, chartbase);
 
