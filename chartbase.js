@@ -103,7 +103,9 @@
             opts.forEach(function (optgroup) {
                 d3.map(optgroup).forEach(function (key, value) {
                     var value = value instanceof Array ? value : [ value ];
-                    selection[key].apply(selection, value)
+                    if (selection[key]) {
+                        selection[key].apply(selection, value);
+                    }
                 });
             });
         };
