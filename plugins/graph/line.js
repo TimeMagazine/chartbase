@@ -2,6 +2,9 @@
     var plugin = function (chart, opts) {
         var opts = opts || {};
 
+        var duration = opts.duration || 0;
+        var delay = opts.delay || 0;
+
         var scales = chart.properties.scales;
 
         var line = d3.svg.line()
@@ -10,9 +13,18 @@
 
         chartbase.apply_options(opts)(line);
 
-        var linepath = chart.elements.inner.append("path")
-            .datum(chart.data)
-            .attr("class", "chartbase-line")
+        // only append new element if one isn't already there
+        // (we want to be able to re-invoke this plugin on an existing axis for resizing and rescaling)
+        chart.elements.inner.selectAll(".chartbase-line")
+            .data([chart.data])
+            .enter()
+            .append("path")
+            .attr("class", "chartbase-line");
+
+        chart.elements.inner.selectAll(".chartbase-line")
+            .transition()
+            .duration(duration)
+            .delay(delay)
             .attr("d", line);
 
     };

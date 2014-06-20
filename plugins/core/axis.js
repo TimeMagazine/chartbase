@@ -10,6 +10,15 @@
         opts.direction = opts.direction || (name === "y" ? "vertical" : "horizontal");
         opts.direction = opts.direction[0].toLowerCase();
 
+        var duration = opts.duration || 0;
+        var delay = opts.delay || 0;
+
+        // few convenience shortcuts for options
+        opts.options = opts.options || {};
+        if (opts.gridlines) {
+            opts.options.tickSize = opts.direction === "v" ? [-chart.properties.width, 0] : [-chart.properties.height, 0]
+        }
+
         chart.elements.axes = chart.elements.axes || {};
 
         var inner = chart.elements.inner;
@@ -25,15 +34,22 @@
             .tickSize(4, 0)
             .orient(opts.orientation || (opts.direction === "v" ? "left" : "bottom"));
 
-        if (opts.options) {
-            chartbase.apply_options(opts.options)(axis);
-        }
+        chartbase.apply_options(opts.options)(axis);
 
-        var axisElements = inner.append("g")
-            .attr("class", "chartbase-" + name + " chartbase-axis")
+        // only append new element if one isn't already there
+        // (we want to be able to re-invoke this plugin on an existing axis for resizing and rescaling)
+        inner.selectAll(".chartbase-" + name)
+            .data([axes[name]])
+            .enter()
+            .append("g")
+            .attr("class", "chartbase-" + name + " chartbase-axis");
+
+        inner.selectAll(".chartbase-" + name)
+            .transition()
+            .duration(duration)
+            .delay(delay)
             .attr("transform", opts.direction === "v" ? "translate(0,0)" : "translate(0," + chart.properties.height + ")")
-            .call(axes[name]);
-
+            .call(axis);
     };
 
     chartbase.register("core/axis", axis);
@@ -44,7 +60,7 @@
         opts.forEach(function(o) {
             axis(chart, o);
         });
-    }
+    } 
 
     chartbase.register("core/axes", axes);
 
